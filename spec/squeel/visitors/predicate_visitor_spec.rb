@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'squeel/adapters/active_record/context'
 
 module Squeel
   module Visitors

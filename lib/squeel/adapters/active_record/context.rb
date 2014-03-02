@@ -7,27 +7,27 @@ module Squeel
 
         def initialize(object)
           super
-          @base = object.join_base
-          @engine = @base.arel_engine
+          @base = object.join_root.first
+          @engine = @base.base_klass.arel_engine
           @arel_visitor = get_arel_visitor
           @default_table = Arel::Table.new(@base.table_name, :as => @base.aliased_table_name, :engine => @engine)
         end
 
         def find(object, parent = @base)
-          if JoinPart === parent
+          if ::ActiveRecord::Associations::JoinDependency::JoinPart === parent
             case object
             when String, Symbol, Nodes::Stub
               assoc_name = object.to_s
-              @object.join_associations.detect { |j|
-                j.reflection.name.to_s == assoc_name && j.parent == parent
+              @object.join_root.drop(1).detect { |j|
+                j.reflection.name.to_s == assoc_name && parent.children.any?{|c| c.tables.first.right == j.tables.first.right}
               }
             when Nodes::Join
-              @object.join_associations.detect { |j|
+              @object.join_root.drop(1).detect { |j|
                 j.reflection.name == object._name && j.parent == parent &&
                 (object.polymorphic? ? j.reflection.klass == object._klass : true)
               }
             else
-              @object.join_associations.detect { |j|
+              @object.join_root.drop(1).detect { |j|
                 j.reflection == object && j.parent == parent
               }
             end
@@ -74,11 +74,6 @@ module Squeel
 
       end
 
-      if defined?(::ActiveRecord::Associations::JoinDependency::JoinPart)
-        JoinPart = ::ActiveRecord::Associations::JoinDependency::JoinPart
-      elsif defined?(::ActiveRecord::Associations::ClassMethods::JoinDependency::JoinBase)
-        JoinPart = ::ActiveRecord::Associations::ClassMethods::JoinDependency::JoinBase
-      end
     end
   end
 end

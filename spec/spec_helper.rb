@@ -1,6 +1,8 @@
 require 'machinist/active_record'
 require 'sham'
 require 'faker'
+require 'squeel/context'
+require 'squeel/adapters/active_record/context'
 
 module ActiveRecord
   # Shamelessly swiped from the AR test code

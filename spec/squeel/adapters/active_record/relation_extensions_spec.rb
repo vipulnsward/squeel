@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'squeel/adapters/active_record/relation_extensions'
 
 module Squeel
   module Adapters

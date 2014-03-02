@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'squeel/adapters/active_record/context'
 
 module Squeel
   module Visitors
@@ -68,7 +69,7 @@ module Squeel
       it 'allows a subquery as a selection' do
         relation = Person.where(:name => 'Aric Smith').select(:id)
         node = @v.accept(relation.as('aric'))
-        node.to_sql.should be_like "(SELECT \"people\".\"id\" FROM \"people\"  WHERE \"people\".\"name\" = 'Aric Smith') aric"
+        node.to_sql.should be_like "(SELECT id FROM \"people\"  WHERE \"people\".\"name\" = 'Aric Smith') aric"
       end
 
       it 'creates an Arel NamedFunction node for a Function node' do
